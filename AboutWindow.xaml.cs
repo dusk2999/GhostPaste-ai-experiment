@@ -12,6 +12,8 @@ public partial class AboutWindow : Window
         InitializeComponent();
         GitHubLink.Text = AppInfo.GitHubUrl;
         CreditLine.Text = AppInfo.CreditLine;
+        DescriptionText.Text = AppInfo.Description;
+        UsageList.ItemsSource = AppInfo.UsageInstructions;
         SourceInitialized += (_, _) => GlassHelper.Apply(this);
     }
 
