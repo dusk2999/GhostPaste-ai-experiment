@@ -52,6 +52,15 @@ public partial class MainWindow : Window
         Close();
     }
 
+    private void AboutButton_Click(object sender, RoutedEventArgs e)
+    {
+        var aboutWindow = new AboutWindow
+        {
+            Owner = this
+        };
+        aboutWindow.ShowDialog();
+    }
+
     private async void SendButton_Click(object sender, RoutedEventArgs e)
     {
         var text = InputBox.Text;

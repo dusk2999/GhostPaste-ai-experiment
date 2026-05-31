@@ -92,10 +92,16 @@
                            Foreground="#DD000000"
                            FontSize="14" FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
-                <Button Content="✕"
-                        HorizontalAlignment="Right"
-                        Click="CloseButton_Click"
-                        Style="{StaticResource CloseButtonStyle}"/>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="?"
+                            Click="AboutButton_Click"
+                            Style="{StaticResource CloseButtonStyle}"/>
+                    <Button Content="✕"
+                            Margin="4,0,0,0"
+                            Click="CloseButton_Click"
+                            Style="{StaticResource CloseButtonStyle}"/>
+                </StackPanel>
             </Grid>
 
             <!-- Text input -->

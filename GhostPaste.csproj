@@ -13,4 +13,11 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="GhostPaste.Tests\**\*.cs" />
+    <EmbeddedResource Remove="GhostPaste.Tests\**\*" />
+    <None Remove="GhostPaste.Tests\**\*" />
+    <Page Remove="GhostPaste.Tests\**\*.xaml" />
+  </ItemGroup>
+
 </Project>
