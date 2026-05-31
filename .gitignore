@@ -1,0 +1,12 @@
+bin/
+obj/
+publish/
+publish_out/
+
+*.user
+*.suo
+*.rsuser
+.vs/
+
+TestResults/
+*.nupkg
