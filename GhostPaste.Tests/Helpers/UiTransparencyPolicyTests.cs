@@ -6,12 +6,12 @@ namespace GhostPaste.Tests.Helpers;
 public sealed class UiTransparencyPolicyTests
 {
     [TestMethod]
-    public void FullyTransparentValueDisablesAcrylicAndBackgrounds()
+    public void FullyTransparentValueDisablesAcrylicAndKeepsHitTestSurface()
     {
         var style = UiTransparencyPolicy.FromSliderValue(0);
 
         Assert.IsFalse(style.AcrylicEnabled);
-        Assert.AreEqual(0, style.ChromeAlpha);
+        Assert.AreEqual(1, style.ChromeAlpha);
         Assert.AreEqual(0, style.PanelAlpha);
         Assert.AreEqual(0, style.AnswerAlpha);
     }
@@ -30,7 +30,7 @@ public sealed class UiTransparencyPolicyTests
     [TestMethod]
     public void SliderValueIsClamped()
     {
-        Assert.AreEqual(0, UiTransparencyPolicy.FromSliderValue(-20).ChromeAlpha);
+        Assert.AreEqual(1, UiTransparencyPolicy.FromSliderValue(-20).ChromeAlpha);
         Assert.AreEqual(0x40, UiTransparencyPolicy.FromSliderValue(150).ChromeAlpha);
     }
 }
