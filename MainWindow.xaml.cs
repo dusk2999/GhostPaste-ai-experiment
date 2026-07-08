@@ -1,8 +1,11 @@
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using GhostPaste.AI;
 using GhostPaste.Helpers;
 using GhostPaste.Native;
+using GhostPaste.Screenshots;
 
 namespace GhostPaste;
 
@@ -11,11 +14,16 @@ public partial class MainWindow : Window
     private nint _targetWindow;
     private nint _selfHandle;
     private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _aiCts;
     private readonly DispatcherTimer _tracker;
+    private readonly ResponsesAiClient _aiClient;
+    private readonly ScreenshotService _screenshotService = new();
+    private AiMessageAttachment? _currentAttachment;
 
     public MainWindow()
     {
         InitializeComponent();
+        _aiClient = new ResponsesAiClient(new HttpClient(), AiSettings.Default);
         SourceInitialized += OnSourceInitialized;
 
         // Poll foreground window every 300ms to track the last non-self window
@@ -59,6 +67,98 @@ public partial class MainWindow : Window
             Owner = this
         };
         aboutWindow.ShowDialog();
+    }
+
+    private async void FullScreenCaptureButton_Click(object sender, RoutedEventArgs e)
+    {
+        await CaptureWithHiddenWindowAsync(() => _screenshotService.CaptureFullScreen());
+    }
+
+    private async void TargetWindowCaptureButton_Click(object sender, RoutedEventArgs e)
+    {
+        await CaptureWithHiddenWindowAsync(() => _screenshotService.CaptureWindowFromScreen(_targetWindow));
+    }
+
+    private void PrintWindowCaptureButton_Click(object sender, RoutedEventArgs e)
+    {
+        SetScreenshotAttachment(_screenshotService.CaptureWindowWithPrintWindow(_targetWindow));
+    }
+
+    private async Task CaptureWithHiddenWindowAsync(Func<ScreenshotResult> capture)
+    {
+        try
+        {
+            Topmost = false;
+            Hide();
+            await Task.Delay(160);
+            SetScreenshotAttachment(capture());
+        }
+        finally
+        {
+            Show();
+            Topmost = true;
+        }
+    }
+
+    private void SetScreenshotAttachment(ScreenshotResult result)
+    {
+        if (!result.HasImage)
+        {
+            _currentAttachment = null;
+            AttachmentStatusText.Text = result.Message;
+            return;
+        }
+
+        _currentAttachment = new AiMessageAttachment("screenshot.png", "image/png", result.ToDataUrl());
+        AttachmentStatusText.Text = $"{result.StrategyName}已添加：{result.Width} x {result.Height}";
+
+        string marker = $"[已附加截图：{result.StrategyName} {result.Width} x {result.Height}]";
+        if (!AiPromptBox.Text.Contains(marker, StringComparison.Ordinal))
+        {
+            AiPromptBox.AppendText((AiPromptBox.Text.Length > 0 ? Environment.NewLine : "") + marker);
+        }
+    }
+
+    private async void AiSendButton_Click(object sender, RoutedEventArgs e)
+    {
+        string prompt = AiPromptBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(prompt) && _currentAttachment is null)
+        {
+            AiAnswerBox.Text = "请输入问题，或先添加一张截图。";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(prompt))
+        {
+            prompt = "请分析这张截图。";
+        }
+
+        AiSendButton.IsEnabled = false;
+        AiSendButton.Content = "AI 回复中...";
+        AiAnswerBox.Text = "正在请求 AI...";
+        _aiCts = new CancellationTokenSource();
+
+        try
+        {
+            var attachments = _currentAttachment is null
+                ? Array.Empty<AiMessageAttachment>()
+                : [_currentAttachment];
+            AiAnswerBox.Text = await _aiClient.SendAsync(prompt, attachments, _aiCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            AiAnswerBox.Text = "AI 请求已取消。";
+        }
+        catch (Exception ex)
+        {
+            AiAnswerBox.Text = $"AI 请求失败：{ex.Message}";
+        }
+        finally
+        {
+            _aiCts = null;
+            AiSendButton.IsEnabled = true;
+            AiSendButton.Content = "发送给 AI";
+        }
     }
 
     private async void SendButton_Click(object sender, RoutedEventArgs e)
@@ -165,6 +265,11 @@ public partial class MainWindow : Window
         if (e.Key == Key.Escape && _cts != null)
         {
             _cts.Cancel();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && _aiCts != null)
+        {
+            _aiCts.Cancel();
             e.Handled = true;
         }
         base.OnKeyDown(e);
