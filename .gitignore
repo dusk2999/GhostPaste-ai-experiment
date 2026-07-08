@@ -7,6 +7,8 @@ publish_out/
 *.suo
 *.rsuser
 .vs/
+LocalSecrets.g.cs
+**/LocalSecrets.g.cs
 
 TestResults/
 *.nupkg
