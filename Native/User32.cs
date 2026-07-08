@@ -35,6 +35,14 @@ internal static partial class User32
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool PostMessageW(nint hWnd, uint msg, nint wParam, nint lParam);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool GetWindowRect(nint hWnd, out RECT lpRect);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool PrintWindow(nint hwnd, nint hdcBlt, uint nFlags);
 }
 
 internal static partial class Imm32
@@ -97,4 +105,13 @@ internal struct KEYBDINPUT
 
     public const uint KEYEVENTF_UNICODE = 0x0004;
     public const uint KEYEVENTF_KEYUP = 0x0002;
+}
+
+[StructLayout(LayoutKind.Sequential)]
+internal struct RECT
+{
+    public int Left;
+    public int Top;
+    public int Right;
+    public int Bottom;
 }
