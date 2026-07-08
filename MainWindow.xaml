@@ -82,7 +82,8 @@
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="12"
+    <Border x:Name="WindowChromeBorder"
+            CornerRadius="12"
             Background="#40FFFFFF"
             BorderBrush="#30000000"
             BorderThickness="1"
@@ -98,6 +99,26 @@
                            Foreground="#DD000000"
                            FontSize="14" FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="完全透明"
+                               Foreground="#88000000"
+                               FontSize="11"
+                               VerticalAlignment="Center"/>
+                    <Slider x:Name="UiOpacitySlider"
+                            Width="130"
+                            Minimum="0"
+                            Maximum="100"
+                            Value="100"
+                            Margin="8,0"
+                            VerticalAlignment="Center"
+                            ValueChanged="UiOpacitySlider_ValueChanged"/>
+                    <TextBlock Text="清晰"
+                               Foreground="#88000000"
+                               FontSize="11"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right">
                     <Button Content="?"

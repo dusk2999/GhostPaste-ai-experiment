@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using GhostPaste.AI;
 using GhostPaste.Helpers;
@@ -30,6 +31,7 @@ public partial class MainWindow : Window
         _tracker = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
         _tracker.Tick += Tracker_Tick;
         _tracker.Start();
+        ApplyUiTransparency(100);
     }
 
     private void OnSourceInitialized(object? sender, EventArgs e)
@@ -67,6 +69,29 @@ public partial class MainWindow : Window
             Owner = this
         };
         aboutWindow.ShowDialog();
+    }
+
+    private void UiOpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        ApplyUiTransparency(e.NewValue);
+    }
+
+    private void ApplyUiTransparency(double value)
+    {
+        if (!IsInitialized)
+        {
+            return;
+        }
+
+        double ratio = Math.Clamp(value / 100.0, 0.0, 1.0);
+        byte chromeAlpha = (byte)Math.Round(0x40 * ratio);
+        byte panelAlpha = (byte)Math.Round(0x60 * ratio);
+        byte answerAlpha = (byte)Math.Round(0x50 * ratio);
+
+        WindowChromeBorder.Background = new SolidColorBrush(Color.FromArgb(chromeAlpha, 0xFF, 0xFF, 0xFF));
+        InputBox.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0xFF, 0xFF, 0xFF));
+        AiPromptBox.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0xFF, 0xFF, 0xFF));
+        AiAnswerBox.Background = new SolidColorBrush(Color.FromArgb(answerAlpha, 0xFF, 0xFF, 0xFF));
     }
 
     private async void FullScreenCaptureButton_Click(object sender, RoutedEventArgs e)

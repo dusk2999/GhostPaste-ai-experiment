@@ -16,6 +16,17 @@ public sealed class MainWindowLayoutTests
         StringAssert.Contains(xaml, "x:Name=\"AiSendButton\"");
     }
 
+    [TestMethod]
+    public void MainWindowContainsTransparencySlider()
+    {
+        string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
+
+        StringAssert.Contains(xaml, "x:Name=\"WindowChromeBorder\"");
+        StringAssert.Contains(xaml, "x:Name=\"UiOpacitySlider\"");
+        StringAssert.Contains(xaml, "ValueChanged=\"UiOpacitySlider_ValueChanged\"");
+        StringAssert.Contains(xaml, "完全透明");
+    }
+
     private static string FindProjectFile(string fileName)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
