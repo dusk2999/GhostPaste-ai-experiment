@@ -23,14 +23,16 @@
 
 **Files:**
 - Modify: `.gitignore`
-- Create: `LocalSecrets.example.cs`
+- Create: `LocalSecrets.cs`
+- Create: `LocalSecrets.example.txt`
 - Local only: `LocalSecrets.g.cs`
 
 **Interfaces:**
 - Produces: `LocalSecrets.ApiKey`, available only in local ignored builds.
 
 - [ ] Add `LocalSecrets.g.cs` to `.gitignore`.
-- [ ] Add `LocalSecrets.example.cs` with an empty placeholder key and clear comments.
+- [ ] Add `LocalSecrets.cs` with an empty public-safe default.
+- [ ] Add `LocalSecrets.example.txt` with the partial override pattern.
 - [ ] Create local ignored `LocalSecrets.g.cs` with the provided key.
 - [ ] Verify `git check-ignore -v LocalSecrets.g.cs` reports the ignore rule.
 

@@ -41,7 +41,7 @@ The implementation does not attempt to bypass DRM or protected-content restricti
 
 ## Local Secret Handling
 
-The source tree includes `LocalSecrets.example.cs` as a template and `.gitignore` ignores `LocalSecrets.g.cs`. The local worktree can contain `LocalSecrets.g.cs` with the provided key so a local exe works immediately, but that file is never committed.
+The source tree includes `LocalSecrets.cs` with an empty public-safe default and `LocalSecrets.example.txt` as a template. `.gitignore` ignores `LocalSecrets.g.cs`. The local worktree can contain `LocalSecrets.g.cs` with the provided key so a local exe works immediately, but that file is never committed.
 
 ## Testing
 
