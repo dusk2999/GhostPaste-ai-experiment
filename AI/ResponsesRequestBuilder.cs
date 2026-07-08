@@ -13,7 +13,8 @@ public static class ResponsesRequestBuilder
     public static string BuildJson(
         string model,
         string prompt,
-        IReadOnlyList<AiMessageAttachment> attachments)
+        IReadOnlyList<AiMessageAttachment> attachments,
+        string reasoningEffort = "xhigh")
     {
         var content = new List<Dictionary<string, string>>
         {
@@ -36,6 +37,10 @@ public static class ResponsesRequestBuilder
         var request = new
         {
             model,
+            reasoning = new
+            {
+                effort = reasoningEffort
+            },
             input = new[]
             {
                 new

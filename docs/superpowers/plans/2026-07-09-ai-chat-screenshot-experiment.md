@@ -14,6 +14,7 @@
 - Base URL: `http://49.51.186.85/v1`.
 - Endpoint: `/responses`.
 - Default model: `gpt-5.5-fast`.
+- Default reasoning effort: `xhigh`.
 - Local key file: `LocalSecrets.g.cs`, ignored by Git and not committed.
 - Public GitHub releases must not include an executable containing the local key.
 

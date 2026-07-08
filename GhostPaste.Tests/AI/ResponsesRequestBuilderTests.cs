@@ -14,6 +14,7 @@ public sealed class ResponsesRequestBuilderTests
         Assert.AreEqual("http://49.51.186.85/v1/", settings.BaseUri.ToString());
         Assert.AreEqual("http://49.51.186.85/v1/responses", settings.ResponsesUri.ToString());
         Assert.AreEqual("gpt-5.5-fast", settings.Model);
+        Assert.AreEqual("xhigh", settings.ReasoningEffort);
     }
 
     [TestMethod]
@@ -27,6 +28,7 @@ public sealed class ResponsesRequestBuilderTests
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
         Assert.AreEqual("gpt-5.5-fast", root.GetProperty("model").GetString());
+        Assert.AreEqual("xhigh", root.GetProperty("reasoning").GetProperty("effort").GetString());
         var content = root.GetProperty("input")[0].GetProperty("content");
         Assert.AreEqual("input_text", content[0].GetProperty("type").GetString());
         Assert.AreEqual("解释这段文字", content[0].GetProperty("text").GetString());

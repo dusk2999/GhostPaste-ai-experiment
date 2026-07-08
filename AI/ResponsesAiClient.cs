@@ -25,7 +25,11 @@ public sealed class ResponsesAiClient
             return "缺少本地 AI 密钥：请创建 LocalSecrets.g.cs 后重新编译。";
         }
 
-        string requestJson = ResponsesRequestBuilder.BuildJson(_settings.Model, prompt, attachments);
+        string requestJson = ResponsesRequestBuilder.BuildJson(
+            _settings.Model,
+            prompt,
+            attachments,
+            _settings.ReasoningEffort);
         using var request = new HttpRequestMessage(HttpMethod.Post, _settings.ResponsesUri)
         {
             Content = new StringContent(requestJson, Encoding.UTF8, "application/json")

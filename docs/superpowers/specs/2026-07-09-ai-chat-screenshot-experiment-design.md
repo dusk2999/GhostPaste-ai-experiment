@@ -15,6 +15,7 @@ The app sends requests to an OpenAI-compatible Responses endpoint:
 - Base URL: `http://49.51.186.85/v1`
 - Endpoint: `/responses`
 - Default model: `gpt-5.5-fast`
+- Default reasoning effort: `xhigh`
 - Request format: Responses API-style `input` containing `input_text` and optional `input_image` data URLs.
 - Response parsing: prefer `output_text`; fall back to `output[].content[].text` and compatible text fields.
 
