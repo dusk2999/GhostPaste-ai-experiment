@@ -13,6 +13,17 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
 
     <Window.Resources>
+        <SolidColorBrush x:Key="ChromeSurfaceBrush" Color="#40FFFFFF"/>
+        <SolidColorBrush x:Key="PanelSurfaceBrush" Color="#60FFFFFF"/>
+        <SolidColorBrush x:Key="AnswerSurfaceBrush" Color="#50FFFFFF"/>
+        <SolidColorBrush x:Key="ControlSurfaceBrush" Color="#50FFFFFF"/>
+        <SolidColorBrush x:Key="ControlHoverBrush" Color="#70FFFFFF"/>
+        <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#CC2563EB"/>
+        <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="#DD3B82F6"/>
+        <SolidColorBrush x:Key="PrimaryButtonPressedBrush" Color="#AA1D4ED8"/>
+        <SolidColorBrush x:Key="PrimaryButtonTextBrush" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrush" Color="#802563EB"/>
+
         <Style x:Key="CloseButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="28"/>
             <Setter Property="Height" Value="28"/>
@@ -41,14 +52,18 @@
         </Style>
 
         <Style x:Key="SendButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#CC2563EB"/>
-            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryButtonBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryButtonTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PrimaryButtonBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bd"
                                 Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center"
@@ -56,10 +71,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#DD3B82F6"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PrimaryButtonHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#AA1D4ED8"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PrimaryButtonPressedBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Bd" Property="Background" Value="#40DDDDDD"/>
@@ -75,16 +90,101 @@
             <Setter Property="Height" Value="30"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="Foreground" Value="#DD000000"/>
-            <Setter Property="Background" Value="#50FFFFFF"/>
+            <Setter Property="Background" Value="{StaticResource ControlSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="#24000000"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PanelSurfaceBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#66000000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TransparentTabControlStyle" TargetType="TabControl">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid KeyboardNavigation.TabNavigation="Local">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TabPanel Grid.Row="0"
+                                      IsItemsHost="True"
+                                      KeyboardNavigation.TabIndex="1"
+                                      Background="Transparent"/>
+                            <ContentPresenter Grid.Row="1"
+                                              ContentSource="SelectedContent"
+                                              Margin="{TemplateBinding Padding}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TransparentTabItemStyle" TargetType="TabItem">
+            <Setter Property="Foreground" Value="#CC000000"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="HeaderBorder"
+                                Background="{StaticResource ControlSurfaceBrush}"
+                                BorderBrush="#20000000"
+                                BorderThickness="1"
+                                CornerRadius="7"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header"
+                                              RecognizesAccessKey="True"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource PanelSurfaceBrush}"/>
+                                <Setter Property="Foreground" Value="#F0000000"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
     <Border x:Name="WindowChromeBorder"
             CornerRadius="12"
-            Background="#40FFFFFF"
+            Background="{StaticResource ChromeSurfaceBrush}"
             BorderBrush="#30000000"
             BorderThickness="1"
             Padding="16">
@@ -132,9 +232,10 @@
             </Grid>
 
             <TabControl Grid.Row="1"
-                        Background="Transparent"
-                        BorderThickness="0">
-                <TabItem Header="粘贴发送">
+                        Style="{StaticResource TransparentTabControlStyle}"
+                        ItemContainerStyle="{StaticResource TransparentTabItemStyle}">
+                <TabItem Header="粘贴发送"
+                         Style="{StaticResource TransparentTabItemStyle}">
                     <Grid Margin="0,12,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -151,7 +252,7 @@
                                  FontSize="14"
                                  Foreground="#EE000000"
                                  CaretBrush="#AA000000"
-                                 Background="#60FFFFFF"
+                                 Background="{StaticResource PanelSurfaceBrush}"
                                  BorderBrush="#20000000"
                                  BorderThickness="1"
                                  Padding="10,8"
@@ -191,12 +292,15 @@
                                 Margin="0,12,0,0"
                                 Height="38"
                                 FontSize="14" FontWeight="SemiBold"
-                                Foreground="White"
+                                Foreground="{StaticResource PrimaryButtonTextBrush}"
+                                BorderBrush="{StaticResource PrimaryButtonBorderBrush}"
+                                Background="{StaticResource PrimaryButtonBrush}"
                                 Style="{StaticResource SendButtonStyle}"/>
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="AI问答">
+                <TabItem Header="AI问答"
+                         Style="{StaticResource TransparentTabItemStyle}">
                     <Grid Margin="0,12,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -214,7 +318,7 @@
                                  FontSize="13"
                                  Foreground="#EE000000"
                                  CaretBrush="#AA000000"
-                                 Background="#60FFFFFF"
+                                 Background="{StaticResource PanelSurfaceBrush}"
                                  BorderBrush="#20000000"
                                  BorderThickness="1"
                                  Padding="10,8"
@@ -225,16 +329,19 @@
                                 <Button x:Name="FullScreenCaptureButton"
                                         Content="全屏截图"
                                         Click="FullScreenCaptureButton_Click"
+                                        Background="{StaticResource ControlSurfaceBrush}"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,8"/>
                                 <Button x:Name="TargetWindowCaptureButton"
                                         Content="目标窗口截图"
                                         Click="TargetWindowCaptureButton_Click"
+                                        Background="{StaticResource ControlSurfaceBrush}"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,8"/>
                                 <Button x:Name="PrintWindowCaptureButton"
                                         Content="PrintWindow截图"
                                         Click="PrintWindowCaptureButton_Click"
+                                        Background="{StaticResource ControlSurfaceBrush}"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,8"/>
                             </WrapPanel>
@@ -245,18 +352,23 @@
                                        TextWrapping="Wrap"/>
                         </StackPanel>
 
-                        <TextBox Grid.Row="2"
-                                 x:Name="AiAnswerBox"
-                                 IsReadOnly="True"
-                                 AcceptsReturn="True"
-                                 TextWrapping="Wrap"
-                                 VerticalScrollBarVisibility="Auto"
-                                 FontSize="13"
-                                 Foreground="#EE000000"
-                                 Background="#50FFFFFF"
-                                 BorderBrush="#20000000"
-                                 BorderThickness="1"
-                                 Padding="10,8"/>
+                        <RichTextBox Grid.Row="2"
+                                     x:Name="AiMarkdownViewer"
+                                     IsReadOnly="True"
+                                     IsDocumentEnabled="True"
+                                     VerticalScrollBarVisibility="Auto"
+                                     FontSize="13"
+                                     Foreground="#EE000000"
+                                     Background="{StaticResource AnswerSurfaceBrush}"
+                                     BorderBrush="#20000000"
+                                     BorderThickness="1"
+                                     Padding="10,8">
+                            <RichTextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                </Style>
+                            </RichTextBox.Resources>
+                        </RichTextBox>
 
                         <Button Grid.Row="3"
                                 x:Name="AiSendButton"
@@ -265,7 +377,9 @@
                                 Margin="0,12,0,0"
                                 Height="38"
                                 FontSize="14" FontWeight="SemiBold"
-                                Foreground="White"
+                                Foreground="{StaticResource PrimaryButtonTextBrush}"
+                                BorderBrush="{StaticResource PrimaryButtonBorderBrush}"
+                                Background="{StaticResource PrimaryButtonBrush}"
                                 Style="{StaticResource SendButtonStyle}"/>
                     </Grid>
                 </TabItem>

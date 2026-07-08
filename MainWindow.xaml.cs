@@ -19,6 +19,7 @@ public partial class MainWindow : Window
     private bool _isSourceReady;
     private readonly DispatcherTimer _tracker;
     private readonly ResponsesAiClient _aiClient;
+    private readonly MarkdownFlowDocumentRenderer _markdownRenderer = new();
     private readonly ScreenshotService _screenshotService = new();
     private AiMessageAttachment? _currentAttachment;
 
@@ -91,10 +92,35 @@ public partial class MainWindow : Window
             GlassHelper.SetAcrylicEnabled(this, style.AcrylicEnabled);
         }
 
-        WindowChromeBorder.Background = new SolidColorBrush(Color.FromArgb(style.ChromeAlpha, 0xFF, 0xFF, 0xFF));
-        InputBox.Background = new SolidColorBrush(Color.FromArgb(style.PanelAlpha, 0xFF, 0xFF, 0xFF));
-        AiPromptBox.Background = new SolidColorBrush(Color.FromArgb(style.PanelAlpha, 0xFF, 0xFF, 0xFF));
-        AiAnswerBox.Background = new SolidColorBrush(Color.FromArgb(style.AnswerAlpha, 0xFF, 0xFF, 0xFF));
+        SetBrushAlpha("ChromeSurfaceBrush", style.ChromeAlpha, 0xFF, 0xFF, 0xFF);
+        SetBrushAlpha("PanelSurfaceBrush", style.PanelAlpha, 0xFF, 0xFF, 0xFF);
+        SetBrushAlpha("AnswerSurfaceBrush", style.AnswerAlpha, 0xFF, 0xFF, 0xFF);
+        SetBrushAlpha("ControlSurfaceBrush", style.ControlAlpha, 0xFF, 0xFF, 0xFF);
+        SetBrushAlpha("ControlHoverBrush", style.ControlHoverAlpha, 0xFF, 0xFF, 0xFF);
+        SetBrushAlpha("PrimaryButtonBrush", style.PrimaryButtonAlpha, 0x25, 0x63, 0xEB);
+        SetBrushAlpha("PrimaryButtonHoverBrush", style.PrimaryButtonHoverAlpha, 0x3B, 0x82, 0xF6);
+        SetBrushAlpha("PrimaryButtonPressedBrush", style.PrimaryButtonPressedAlpha, 0x1D, 0x4E, 0xD8);
+        double primaryRatio = style.PrimaryButtonAlpha / (double)0xCC;
+        byte textChannel = (byte)Math.Round(0x18 + ((0xFF - 0x18) * primaryRatio));
+        SetBrushAlpha("PrimaryButtonTextBrush", 0xFF, textChannel, textChannel, textChannel);
+        SetBrushAlpha("PrimaryButtonBorderBrush", 0x80, 0x25, 0x63, 0xEB);
+    }
+
+    private void SetBrushAlpha(string resourceKey, byte alpha, byte red, byte green, byte blue)
+    {
+        var color = Color.FromArgb(alpha, red, green, blue);
+        if (Resources[resourceKey] is SolidColorBrush brush)
+        {
+            brush.Color = color;
+            return;
+        }
+
+        Resources[resourceKey] = new SolidColorBrush(color);
+    }
+
+    private void SetAiAnswerMarkdown(string markdown)
+    {
+        AiMarkdownViewer.Document = _markdownRenderer.Render(markdown);
     }
 
     private async void FullScreenCaptureButton_Click(object sender, RoutedEventArgs e)
@@ -152,7 +178,7 @@ public partial class MainWindow : Window
         string prompt = AiPromptBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(prompt) && _currentAttachment is null)
         {
-            AiAnswerBox.Text = "请输入问题，或先添加一张截图。";
+            SetAiAnswerMarkdown("请输入问题，或先添加一张截图。");
             return;
         }
 
@@ -163,7 +189,7 @@ public partial class MainWindow : Window
 
         AiSendButton.IsEnabled = false;
         AiSendButton.Content = "AI 回复中...";
-        AiAnswerBox.Text = "正在请求 AI...";
+        SetAiAnswerMarkdown("正在请求 AI...");
         _aiCts = new CancellationTokenSource();
 
         try
@@ -171,15 +197,15 @@ public partial class MainWindow : Window
             var attachments = _currentAttachment is null
                 ? Array.Empty<AiMessageAttachment>()
                 : [_currentAttachment];
-            AiAnswerBox.Text = await _aiClient.SendAsync(prompt, attachments, _aiCts.Token);
+            SetAiAnswerMarkdown(await _aiClient.SendAsync(prompt, attachments, _aiCts.Token));
         }
         catch (OperationCanceledException)
         {
-            AiAnswerBox.Text = "AI 请求已取消。";
+            SetAiAnswerMarkdown("AI 请求已取消。");
         }
         catch (Exception ex)
         {
-            AiAnswerBox.Text = $"AI 请求失败：{ex.Message}";
+            SetAiAnswerMarkdown($"AI 请求失败：{ex.Message}");
         }
         finally
         {

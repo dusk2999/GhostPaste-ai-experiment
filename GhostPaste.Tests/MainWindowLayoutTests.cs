@@ -17,6 +17,42 @@ public sealed class MainWindowLayoutTests
     }
 
     [TestMethod]
+    public void MainWindowUsesTransparentResourceBrushesForInteractiveControls()
+    {
+        string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
+
+        StringAssert.Contains(xaml, "x:Key=\"ChromeSurfaceBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"PanelSurfaceBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"AnswerSurfaceBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"ControlSurfaceBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"ControlHoverBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"PrimaryButtonBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"PrimaryButtonTextBrush\"");
+        StringAssert.Contains(xaml, "x:Key=\"PrimaryButtonBorderBrush\"");
+        StringAssert.Contains(xaml, "Background=\"{StaticResource ControlSurfaceBrush}\"");
+        StringAssert.Contains(xaml, "Background=\"{StaticResource PrimaryButtonBrush}\"");
+        StringAssert.Contains(xaml, "Foreground=\"{StaticResource PrimaryButtonTextBrush}\"");
+        StringAssert.Contains(xaml, "BorderBrush=\"{StaticResource PrimaryButtonBorderBrush}\"");
+        StringAssert.Contains(xaml, "Style=\"{StaticResource TransparentTabItemStyle}\"");
+    }
+
+    [TestMethod]
+    public void MainWindowUsesMarkdownViewerForAiOutput()
+    {
+        string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
+        string code = File.ReadAllText(FindProjectFile("MainWindow.xaml.cs"));
+
+        StringAssert.Contains(xaml, "<RichTextBox");
+        StringAssert.Contains(xaml, "x:Name=\"AiMarkdownViewer\"");
+        StringAssert.Contains(xaml, "IsDocumentEnabled=\"True\"");
+        Assert.IsFalse(xaml.Contains("x:Name=\"AiAnswerBox\"", StringComparison.Ordinal));
+
+        StringAssert.Contains(code, "MarkdownFlowDocumentRenderer");
+        StringAssert.Contains(code, "SetAiAnswerMarkdown");
+        StringAssert.Contains(code, "AiMarkdownViewer.Document");
+    }
+
+    [TestMethod]
     public void MainWindowContainsTransparencySlider()
     {
         string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
