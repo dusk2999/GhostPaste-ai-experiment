@@ -16,6 +16,7 @@ public partial class MainWindow : Window
     private nint _selfHandle;
     private CancellationTokenSource? _cts;
     private CancellationTokenSource? _aiCts;
+    private bool _isSourceReady;
     private readonly DispatcherTimer _tracker;
     private readonly ResponsesAiClient _aiClient;
     private readonly ScreenshotService _screenshotService = new();
@@ -37,7 +38,8 @@ public partial class MainWindow : Window
     private void OnSourceInitialized(object? sender, EventArgs e)
     {
         _selfHandle = new System.Windows.Interop.WindowInteropHelper(this).Handle;
-        GlassHelper.Apply(this);
+        _isSourceReady = true;
+        ApplyUiTransparency(UiOpacitySlider.Value);
     }
 
     private void Tracker_Tick(object? sender, EventArgs e)
@@ -83,15 +85,16 @@ public partial class MainWindow : Window
             return;
         }
 
-        double ratio = Math.Clamp(value / 100.0, 0.0, 1.0);
-        byte chromeAlpha = (byte)Math.Round(0x40 * ratio);
-        byte panelAlpha = (byte)Math.Round(0x60 * ratio);
-        byte answerAlpha = (byte)Math.Round(0x50 * ratio);
+        var style = UiTransparencyPolicy.FromSliderValue(value);
+        if (_isSourceReady)
+        {
+            GlassHelper.SetAcrylicEnabled(this, style.AcrylicEnabled);
+        }
 
-        WindowChromeBorder.Background = new SolidColorBrush(Color.FromArgb(chromeAlpha, 0xFF, 0xFF, 0xFF));
-        InputBox.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0xFF, 0xFF, 0xFF));
-        AiPromptBox.Background = new SolidColorBrush(Color.FromArgb(panelAlpha, 0xFF, 0xFF, 0xFF));
-        AiAnswerBox.Background = new SolidColorBrush(Color.FromArgb(answerAlpha, 0xFF, 0xFF, 0xFF));
+        WindowChromeBorder.Background = new SolidColorBrush(Color.FromArgb(style.ChromeAlpha, 0xFF, 0xFF, 0xFF));
+        InputBox.Background = new SolidColorBrush(Color.FromArgb(style.PanelAlpha, 0xFF, 0xFF, 0xFF));
+        AiPromptBox.Background = new SolidColorBrush(Color.FromArgb(style.PanelAlpha, 0xFF, 0xFF, 0xFF));
+        AiAnswerBox.Background = new SolidColorBrush(Color.FromArgb(style.AnswerAlpha, 0xFF, 0xFF, 0xFF));
     }
 
     private async void FullScreenCaptureButton_Click(object sender, RoutedEventArgs e)

@@ -31,13 +31,18 @@ internal static class GlassHelper
 
     public static void Apply(Window window)
     {
+        SetAcrylicEnabled(window, true);
+    }
+
+    public static void SetAcrylicEnabled(Window window, bool enabled)
+    {
         var hwnd = new WindowInteropHelper(window).EnsureHandle();
 
         var accent = new AccentPolicy
         {
-            AccentState = 4, // ACCENT_ENABLE_ACRYLICBLURBEHIND
+            AccentState = enabled ? 4 : 0, // ACCENT_ENABLE_ACRYLICBLURBEHIND / ACCENT_DISABLED
             AccentFlags = 0,
-            GradientColor = 0x20FFFFFF, // 12% white tint (AABBGGRR format) for perfect daytime frost
+            GradientColor = enabled ? 0x20FFFFFFu : 0x00000000u, // AABBGGRR
             AnimationId = 0
         };
 
