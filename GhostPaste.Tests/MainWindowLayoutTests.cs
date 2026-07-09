@@ -85,6 +85,7 @@ public sealed class MainWindowLayoutTests
         StringAssert.Contains(xaml, "Click=\"CopyBoardImageButton_Click\"");
         StringAssert.Contains(xaml, "Click=\"UseBoardRecordForAiButton_Click\"");
         StringAssert.Contains(code, "RecordBoard");
+        StringAssert.Contains(code, "BuiltInExerciseRecords.Seed");
         StringAssert.Contains(code, "PasteClipboardImageButton_Click");
         StringAssert.Contains(code, "TryCreateAttachmentFromClipboardImage");
         StringAssert.Contains(code, "RefreshBoardRecords");

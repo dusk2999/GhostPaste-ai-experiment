@@ -35,7 +35,9 @@ public partial class MainWindow : Window
         _tracker = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
         _tracker.Tick += Tracker_Tick;
         _tracker.Start();
+        BuiltInExerciseRecords.Seed(_recordBoard);
         BoardRecordsList.ItemsSource = _recordBoard.Records;
+        BoardStatusText.Text = $"已内置 {_recordBoard.Records.Count} 条计算机网络练习题记录";
         ApplyUiTransparency(100);
         UpdateAttachmentPreview();
     }

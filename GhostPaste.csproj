@@ -25,4 +25,10 @@
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Records\BuiltInComputerNetworkExercises.md" />
+    <EmbeddedResource Include="Records\BuiltInComputerNetworkExercises.md"
+                      LogicalName="GhostPaste.Records.BuiltInComputerNetworkExercises.md" />
+  </ItemGroup>
+
 </Project>
