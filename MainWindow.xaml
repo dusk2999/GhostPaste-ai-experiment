@@ -180,6 +180,78 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="RecordCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource ControlSurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="#22000000"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+        </Style>
+
+        <DataTemplate x:Key="BoardRecordTemplate">
+            <Border Style="{StaticResource RecordCardStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="{Binding TimeLabel}"
+                               Foreground="#88000000"
+                               FontSize="11"
+                               Margin="0,0,0,6"/>
+
+                    <Image Grid.Row="1"
+                           Source="{Binding PreviewImage}"
+                           Visibility="{Binding ImageVisibility}"
+                           MaxHeight="120"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Left"
+                           Margin="0,0,0,6"/>
+
+                    <TextBlock Grid.Row="2"
+                               Text="{Binding Text}"
+                               Visibility="{Binding TextVisibility}"
+                               Foreground="#E6000000"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8"/>
+
+                    <WrapPanel Grid.Row="3">
+                        <TextBlock Text="{Binding ImageSummary}"
+                                   Visibility="{Binding ImageVisibility}"
+                                   Foreground="#88000000"
+                                   FontSize="11"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,6"/>
+                        <Button Content="复制文本"
+                                Tag="{Binding}"
+                                Click="CopyBoardTextButton_Click"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Margin="0,0,8,6"/>
+                        <Button Content="复制图片"
+                                Tag="{Binding}"
+                                Click="CopyBoardImageButton_Click"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Margin="0,0,8,6"/>
+                        <Button Content="填入 AI"
+                                Tag="{Binding}"
+                                Click="UseBoardRecordForAiButton_Click"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Margin="0,0,8,6"/>
+                        <Button Content="删除"
+                                Tag="{Binding}"
+                                Click="DeleteBoardRecordButton_Click"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Margin="0,0,8,6"/>
+                    </WrapPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </Window.Resources>
 
     <Border x:Name="WindowChromeBorder"
@@ -232,6 +304,7 @@
             </Grid>
 
             <TabControl Grid.Row="1"
+                        x:Name="MainTabControl"
                         Style="{StaticResource TransparentTabControlStyle}"
                         ItemContainerStyle="{StaticResource TransparentTabItemStyle}">
                 <TabItem Header="粘贴发送"
@@ -350,6 +423,60 @@
                                        Foreground="#99000000"
                                        FontSize="12"
                                        TextWrapping="Wrap"/>
+                            <Border x:Name="AttachmentPreviewPanel"
+                                    Visibility="Collapsed"
+                                    Background="{StaticResource ControlSurfaceBrush}"
+                                    BorderBrush="#22000000"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="8"
+                                    Margin="0,8,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Image x:Name="AttachmentPreviewImage"
+                                           Grid.Column="0"
+                                           Width="86"
+                                           Height="58"
+                                           Stretch="Uniform"
+                                           Margin="0,0,10,0"/>
+
+                                    <StackPanel Grid.Column="1"
+                                                VerticalAlignment="Center">
+                                        <TextBlock x:Name="AttachmentPreviewTitle"
+                                                   Text="已添加图片"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#DD000000"/>
+                                        <TextBlock x:Name="AttachmentPreviewMeta"
+                                                   Foreground="#88000000"
+                                                   FontSize="11"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <WrapPanel Grid.Column="2"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Right">
+                                        <Button x:Name="CropAttachmentButton"
+                                                Content="裁切"
+                                                Click="CropAttachmentButton_Click"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                Margin="0,0,8,0"/>
+                                        <Button x:Name="SaveAttachmentToBoardButton"
+                                                Content="存到记录板"
+                                                Click="SaveAttachmentToBoardButton_Click"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                Margin="0,0,8,0"/>
+                                        <Button x:Name="ClearAttachmentButton"
+                                                Content="清除"
+                                                Click="ClearAttachmentButton_Click"
+                                                Style="{StaticResource SecondaryButtonStyle}"/>
+                                    </WrapPanel>
+                                </Grid>
+                            </Border>
                         </StackPanel>
 
                         <RichTextBox Grid.Row="2"
@@ -381,6 +508,66 @@
                                 BorderBrush="{StaticResource PrimaryButtonBorderBrush}"
                                 Background="{StaticResource PrimaryButtonBrush}"
                                 Style="{StaticResource SendButtonStyle}"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="记录板"
+                         Style="{StaticResource TransparentTabItemStyle}">
+                    <Grid Margin="0,12,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBox Grid.Row="0"
+                                 x:Name="BoardInputBox"
+                                 Height="82"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 FontSize="13"
+                                 Foreground="#EE000000"
+                                 CaretBrush="#AA000000"
+                                 Background="{StaticResource PanelSurfaceBrush}"
+                                 BorderBrush="#20000000"
+                                 BorderThickness="1"
+                                 Padding="10,8"
+                                 VerticalContentAlignment="Top"/>
+
+                        <WrapPanel Grid.Row="1"
+                                   Margin="0,10,0,8">
+                            <Button x:Name="AddBoardRecordButton"
+                                    Content="添加记录"
+                                    Click="AddBoardRecordButton_Click"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,8"/>
+                            <Button Content="添加当前图片"
+                                    Click="SaveAttachmentToBoardButton_Click"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,8"/>
+                            <Button x:Name="PasteClipboardImageButton"
+                                    Content="粘贴图片"
+                                    Click="PasteClipboardImageButton_Click"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,8"/>
+                            <Button Content="清空记录"
+                                    Click="ClearBoardButton_Click"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Margin="0,0,8,8"/>
+                            <TextBlock x:Name="BoardStatusText"
+                                       Text="记录只保存在本次打开期间"
+                                       Foreground="#99000000"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,8"/>
+                        </WrapPanel>
+
+                        <ListBox Grid.Row="2"
+                                 x:Name="BoardRecordsList"
+                                 ItemTemplate="{StaticResource BoardRecordTemplate}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"/>
                     </Grid>
                 </TabItem>
             </TabControl>

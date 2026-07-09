@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using GhostPaste.AI;
 using GhostPaste.Helpers;
 using GhostPaste.Native;
+using GhostPaste.Records;
 using GhostPaste.Screenshots;
 
 namespace GhostPaste;
@@ -21,7 +22,8 @@ public partial class MainWindow : Window
     private readonly ResponsesAiClient _aiClient;
     private readonly MarkdownFlowDocumentRenderer _markdownRenderer = new();
     private readonly ScreenshotService _screenshotService = new();
-    private AiMessageAttachment? _currentAttachment;
+    private readonly RecordBoard _recordBoard = new();
+    private ImageAttachment? _currentAttachment;
 
     public MainWindow()
     {
@@ -33,7 +35,9 @@ public partial class MainWindow : Window
         _tracker = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(300) };
         _tracker.Tick += Tracker_Tick;
         _tracker.Start();
+        BoardRecordsList.ItemsSource = _recordBoard.Records;
         ApplyUiTransparency(100);
+        UpdateAttachmentPreview();
     }
 
     private void OnSourceInitialized(object? sender, EventArgs e)
@@ -160,17 +164,230 @@ public partial class MainWindow : Window
         {
             _currentAttachment = null;
             AttachmentStatusText.Text = result.Message;
+            UpdateAttachmentPreview();
+            RemovePromptAttachmentMarker();
             return;
         }
 
-        _currentAttachment = new AiMessageAttachment("screenshot.png", "image/png", result.ToDataUrl());
+        _currentAttachment = ImageAttachment.FromScreenshot(result);
         AttachmentStatusText.Text = $"{result.StrategyName}已添加：{result.Width} x {result.Height}";
+        UpdateAttachmentPreview();
+        UpdatePromptAttachmentMarker(_currentAttachment);
+    }
 
-        string marker = $"[已附加截图：{result.StrategyName} {result.Width} x {result.Height}]";
-        if (!AiPromptBox.Text.Contains(marker, StringComparison.Ordinal))
+    private void UpdateAttachmentPreview()
+    {
+        if (_currentAttachment is null)
         {
-            AiPromptBox.AppendText((AiPromptBox.Text.Length > 0 ? Environment.NewLine : "") + marker);
+            AttachmentPreviewPanel.Visibility = Visibility.Collapsed;
+            AttachmentPreviewImage.Source = null;
+            AttachmentPreviewMeta.Text = "";
+            return;
         }
+
+        AttachmentPreviewPanel.Visibility = Visibility.Visible;
+        AttachmentPreviewImage.Source = WpfImageFactory.FromPngBytes(_currentAttachment.PngBytes);
+        AttachmentPreviewTitle.Text = _currentAttachment.SourceName;
+        AttachmentPreviewMeta.Text = $"{_currentAttachment.Width} x {_currentAttachment.Height}";
+    }
+
+    private void UpdatePromptAttachmentMarker(ImageAttachment attachment)
+    {
+        RemovePromptAttachmentMarker();
+        string marker = $"[已附加截图：{attachment.SourceName} {attachment.Width} x {attachment.Height}]";
+        AiPromptBox.AppendText((AiPromptBox.Text.Length > 0 ? Environment.NewLine : "") + marker);
+    }
+
+    private void RemovePromptAttachmentMarker()
+    {
+        var lines = AiPromptBox.Text
+            .Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Split('\n')
+            .Where(line => !line.StartsWith("[已附加截图：", StringComparison.Ordinal))
+            .ToArray();
+        AiPromptBox.Text = string.Join(Environment.NewLine, lines).TrimEnd();
+        AiPromptBox.CaretIndex = AiPromptBox.Text.Length;
+    }
+
+    private void CropAttachmentButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentAttachment is null)
+        {
+            AttachmentStatusText.Text = "没有可裁切的图片。";
+            return;
+        }
+
+        var cropWindow = new ImageCropWindow(_currentAttachment)
+        {
+            Owner = this,
+            Topmost = Topmost
+        };
+
+        if (cropWindow.ShowDialog() == true && cropWindow.CroppedImage is not null)
+        {
+            _currentAttachment = cropWindow.CroppedImage;
+            AttachmentStatusText.Text = $"{_currentAttachment.SourceName}已添加：{_currentAttachment.Width} x {_currentAttachment.Height}";
+            UpdateAttachmentPreview();
+            UpdatePromptAttachmentMarker(_currentAttachment);
+        }
+    }
+
+    private void ClearAttachmentButton_Click(object sender, RoutedEventArgs e)
+    {
+        _currentAttachment = null;
+        AttachmentStatusText.Text = "未添加截图";
+        UpdateAttachmentPreview();
+        RemovePromptAttachmentMarker();
+    }
+
+    private void SaveAttachmentToBoardButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentAttachment is null)
+        {
+            BoardStatusText.Text = "当前没有图片可添加。";
+            AttachmentStatusText.Text = "当前没有图片可添加。";
+            return;
+        }
+
+        AddBoardRecord(BoardInputBox.Text, _currentAttachment);
+    }
+
+    private void AddBoardRecordButton_Click(object sender, RoutedEventArgs e)
+    {
+        AddBoardRecord(BoardInputBox.Text, null);
+    }
+
+    private void PasteClipboardImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryCreateAttachmentFromClipboardImage(out var image))
+        {
+            BoardStatusText.Text = "剪贴板里没有可用图片。";
+            return;
+        }
+
+        AddBoardRecord(BoardInputBox.Text, image);
+    }
+
+    private static bool TryCreateAttachmentFromClipboardImage(out ImageAttachment? image)
+    {
+        image = null;
+        if (!Clipboard.ContainsImage())
+        {
+            return false;
+        }
+
+        var bitmap = Clipboard.GetImage();
+        if (bitmap is null)
+        {
+            return false;
+        }
+
+        byte[] pngBytes = WpfImageFactory.ToPngBytes(bitmap);
+        image = new ImageAttachment(
+            "clipboard.png",
+            "image/png",
+            pngBytes,
+            bitmap.PixelWidth,
+            bitmap.PixelHeight,
+            "剪贴板图片");
+        return true;
+    }
+
+    private void AddBoardRecord(string? text, ImageAttachment? image)
+    {
+        try
+        {
+            _recordBoard.AddRecord(text, image);
+            BoardInputBox.Clear();
+            RefreshBoardRecords();
+            BoardStatusText.Text = $"已添加记录，共 {_recordBoard.Records.Count} 条。";
+        }
+        catch (ArgumentException)
+        {
+            BoardStatusText.Text = "请输入文本，或先添加一张图片。";
+        }
+    }
+
+    private void RefreshBoardRecords()
+    {
+        BoardRecordsList.Items.Refresh();
+    }
+
+    private void CopyBoardTextButton_Click(object sender, RoutedEventArgs e)
+    {
+        var record = GetBoardRecord(sender);
+        if (record is null || !record.HasText)
+        {
+            BoardStatusText.Text = "这条记录没有文本。";
+            return;
+        }
+
+        Clipboard.SetText(record.Text);
+        BoardStatusText.Text = "已复制文本。";
+    }
+
+    private void CopyBoardImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        var record = GetBoardRecord(sender);
+        if (record?.Image is null)
+        {
+            BoardStatusText.Text = "这条记录没有图片。";
+            return;
+        }
+
+        Clipboard.SetImage(WpfImageFactory.FromPngBytes(record.Image.PngBytes));
+        BoardStatusText.Text = "已复制图片。";
+    }
+
+    private void UseBoardRecordForAiButton_Click(object sender, RoutedEventArgs e)
+    {
+        var record = GetBoardRecord(sender);
+        if (record is null)
+        {
+            return;
+        }
+
+        if (record.HasText)
+        {
+            AiPromptBox.Text = record.Text;
+            AiPromptBox.CaretIndex = AiPromptBox.Text.Length;
+        }
+
+        if (record.Image is not null)
+        {
+            _currentAttachment = record.Image;
+            AttachmentStatusText.Text = $"{_currentAttachment.SourceName}已添加：{_currentAttachment.Width} x {_currentAttachment.Height}";
+            UpdateAttachmentPreview();
+            UpdatePromptAttachmentMarker(_currentAttachment);
+        }
+
+        MainTabControl.SelectedIndex = 1;
+        BoardStatusText.Text = "已填入 AI 问答。";
+    }
+
+    private void DeleteBoardRecordButton_Click(object sender, RoutedEventArgs e)
+    {
+        var record = GetBoardRecord(sender);
+        if (record is null)
+        {
+            return;
+        }
+
+        _recordBoard.Remove(record.Id);
+        RefreshBoardRecords();
+        BoardStatusText.Text = $"已删除记录，共 {_recordBoard.Records.Count} 条。";
+    }
+
+    private void ClearBoardButton_Click(object sender, RoutedEventArgs e)
+    {
+        _recordBoard.Clear();
+        RefreshBoardRecords();
+        BoardStatusText.Text = "记录板已清空。";
+    }
+
+    private static BoardRecord? GetBoardRecord(object sender)
+    {
+        return sender is FrameworkElement { Tag: BoardRecord record } ? record : null;
     }
 
     private async void AiSendButton_Click(object sender, RoutedEventArgs e)
@@ -196,7 +413,7 @@ public partial class MainWindow : Window
         {
             var attachments = _currentAttachment is null
                 ? Array.Empty<AiMessageAttachment>()
-                : [_currentAttachment];
+                : [_currentAttachment.ToAiMessageAttachment()];
             SetAiAnswerMarkdown(await _aiClient.SendAsync(prompt, attachments, _aiCts.Token));
         }
         catch (OperationCanceledException)

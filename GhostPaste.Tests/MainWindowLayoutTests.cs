@@ -53,6 +53,41 @@ public sealed class MainWindowLayoutTests
     }
 
     [TestMethod]
+    public void MainWindowContainsAttachmentPreviewAndCropControls()
+    {
+        string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
+        string code = File.ReadAllText(FindProjectFile("MainWindow.xaml.cs"));
+
+        StringAssert.Contains(xaml, "x:Name=\"AttachmentPreviewPanel\"");
+        StringAssert.Contains(xaml, "x:Name=\"AttachmentPreviewImage\"");
+        StringAssert.Contains(xaml, "x:Name=\"CropAttachmentButton\"");
+        StringAssert.Contains(xaml, "Click=\"CropAttachmentButton_Click\"");
+        StringAssert.Contains(xaml, "x:Name=\"ClearAttachmentButton\"");
+        StringAssert.Contains(code, "UpdateAttachmentPreview");
+        StringAssert.Contains(code, "ImageCropWindow");
+    }
+
+    [TestMethod]
+    public void MainWindowContainsRecordBoardControls()
+    {
+        string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
+        string code = File.ReadAllText(FindProjectFile("MainWindow.xaml.cs"));
+
+        StringAssert.Contains(xaml, "Header=\"记录板\"");
+        StringAssert.Contains(xaml, "x:Name=\"BoardInputBox\"");
+        StringAssert.Contains(xaml, "x:Name=\"AddBoardRecordButton\"");
+        StringAssert.Contains(xaml, "x:Name=\"PasteClipboardImageButton\"");
+        StringAssert.Contains(xaml, "x:Name=\"BoardRecordsList\"");
+        StringAssert.Contains(xaml, "Click=\"CopyBoardTextButton_Click\"");
+        StringAssert.Contains(xaml, "Click=\"CopyBoardImageButton_Click\"");
+        StringAssert.Contains(xaml, "Click=\"UseBoardRecordForAiButton_Click\"");
+        StringAssert.Contains(code, "RecordBoard");
+        StringAssert.Contains(code, "PasteClipboardImageButton_Click");
+        StringAssert.Contains(code, "TryCreateAttachmentFromClipboardImage");
+        StringAssert.Contains(code, "RefreshBoardRecords");
+    }
+
+    [TestMethod]
     public void MainWindowContainsTransparencySlider()
     {
         string xaml = File.ReadAllText(FindProjectFile("MainWindow.xaml"));
