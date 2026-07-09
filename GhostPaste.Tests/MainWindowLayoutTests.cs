@@ -29,10 +29,13 @@ public sealed class MainWindowLayoutTests
         StringAssert.Contains(xaml, "x:Key=\"PrimaryButtonBrush\"");
         StringAssert.Contains(xaml, "x:Key=\"PrimaryButtonTextBrush\"");
         StringAssert.Contains(xaml, "x:Key=\"PrimaryButtonBorderBrush\"");
-        StringAssert.Contains(xaml, "Background=\"{StaticResource ControlSurfaceBrush}\"");
-        StringAssert.Contains(xaml, "Background=\"{StaticResource PrimaryButtonBrush}\"");
-        StringAssert.Contains(xaml, "Foreground=\"{StaticResource PrimaryButtonTextBrush}\"");
-        StringAssert.Contains(xaml, "BorderBrush=\"{StaticResource PrimaryButtonBorderBrush}\"");
+        StringAssert.Contains(xaml, "Background=\"{DynamicResource ControlSurfaceBrush}\"");
+        StringAssert.Contains(xaml, "Background=\"{DynamicResource PrimaryButtonBrush}\"");
+        StringAssert.Contains(xaml, "Foreground=\"{DynamicResource PrimaryButtonTextBrush}\"");
+        StringAssert.Contains(xaml, "BorderBrush=\"{DynamicResource PrimaryButtonBorderBrush}\"");
+        Assert.IsFalse(xaml.Contains("{StaticResource PanelSurfaceBrush}", StringComparison.Ordinal));
+        Assert.IsFalse(xaml.Contains("{StaticResource ControlSurfaceBrush}", StringComparison.Ordinal));
+        Assert.IsFalse(xaml.Contains("{StaticResource PrimaryButtonBrush}", StringComparison.Ordinal));
         StringAssert.Contains(xaml, "Style=\"{StaticResource TransparentTabItemStyle}\"");
     }
 

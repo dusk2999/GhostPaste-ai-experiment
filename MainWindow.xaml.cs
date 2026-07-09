@@ -113,13 +113,7 @@ public partial class MainWindow : Window
     private void SetBrushAlpha(string resourceKey, byte alpha, byte red, byte green, byte blue)
     {
         var color = Color.FromArgb(alpha, red, green, blue);
-        if (Resources[resourceKey] is SolidColorBrush brush)
-        {
-            brush.Color = color;
-            return;
-        }
-
-        Resources[resourceKey] = new SolidColorBrush(color);
+        BrushResourceUpdater.SetBrushColor(Resources, resourceKey, color);
     }
 
     private void SetAiAnswerMarkdown(string markdown)

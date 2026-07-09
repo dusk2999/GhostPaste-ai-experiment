@@ -52,9 +52,9 @@
         </Style>
 
         <Style x:Key="SendButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource PrimaryButtonBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource PrimaryButtonTextBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource PrimaryButtonBorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryButtonBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryButtonTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -71,10 +71,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PrimaryButtonHoverBrush}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PrimaryButtonHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PrimaryButtonPressedBrush}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PrimaryButtonPressedBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Bd" Property="Background" Value="#40DDDDDD"/>
@@ -90,7 +90,7 @@
             <Setter Property="Height" Value="30"/>
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="Foreground" Value="#DD000000"/>
-            <Setter Property="Background" Value="{StaticResource ControlSurfaceBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ControlSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="#24000000"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -108,10 +108,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ControlHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource PanelSurfaceBrush}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PanelSurfaceBrush}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Foreground" Value="#66000000"/>
@@ -156,7 +156,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
                         <Border x:Name="HeaderBorder"
-                                Background="{StaticResource ControlSurfaceBrush}"
+                                Background="{DynamicResource ControlSurfaceBrush}"
                                 BorderBrush="#20000000"
                                 BorderThickness="1"
                                 CornerRadius="7"
@@ -168,12 +168,12 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource PanelSurfaceBrush}"/>
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource PanelSurfaceBrush}"/>
                                 <Setter Property="Foreground" Value="#F0000000"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="HeaderBorder" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ControlHoverBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -182,7 +182,7 @@
         </Style>
 
         <Style x:Key="RecordCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource ControlSurfaceBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ControlSurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="#22000000"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
@@ -256,7 +256,7 @@
 
     <Border x:Name="WindowChromeBorder"
             CornerRadius="12"
-            Background="{StaticResource ChromeSurfaceBrush}"
+            Background="{DynamicResource ChromeSurfaceBrush}"
             BorderBrush="#30000000"
             BorderThickness="1"
             Padding="16">
@@ -325,7 +325,7 @@
                                  FontSize="14"
                                  Foreground="#EE000000"
                                  CaretBrush="#AA000000"
-                                 Background="{StaticResource PanelSurfaceBrush}"
+                                 Background="{DynamicResource PanelSurfaceBrush}"
                                  BorderBrush="#20000000"
                                  BorderThickness="1"
                                  Padding="10,8"
@@ -365,9 +365,9 @@
                                 Margin="0,12,0,0"
                                 Height="38"
                                 FontSize="14" FontWeight="SemiBold"
-                                Foreground="{StaticResource PrimaryButtonTextBrush}"
-                                BorderBrush="{StaticResource PrimaryButtonBorderBrush}"
-                                Background="{StaticResource PrimaryButtonBrush}"
+                                Foreground="{DynamicResource PrimaryButtonTextBrush}"
+                                BorderBrush="{DynamicResource PrimaryButtonBorderBrush}"
+                                Background="{DynamicResource PrimaryButtonBrush}"
                                 Style="{StaticResource SendButtonStyle}"/>
                     </Grid>
                 </TabItem>
@@ -391,7 +391,7 @@
                                  FontSize="13"
                                  Foreground="#EE000000"
                                  CaretBrush="#AA000000"
-                                 Background="{StaticResource PanelSurfaceBrush}"
+                                 Background="{DynamicResource PanelSurfaceBrush}"
                                  BorderBrush="#20000000"
                                  BorderThickness="1"
                                  Padding="10,8"
@@ -402,19 +402,19 @@
                                 <Button x:Name="FullScreenCaptureButton"
                                         Content="全屏截图"
                                         Click="FullScreenCaptureButton_Click"
-                                        Background="{StaticResource ControlSurfaceBrush}"
+                                        Background="{DynamicResource ControlSurfaceBrush}"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,8"/>
                                 <Button x:Name="TargetWindowCaptureButton"
                                         Content="目标窗口截图"
                                         Click="TargetWindowCaptureButton_Click"
-                                        Background="{StaticResource ControlSurfaceBrush}"
+                                        Background="{DynamicResource ControlSurfaceBrush}"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,8"/>
                                 <Button x:Name="PrintWindowCaptureButton"
                                         Content="PrintWindow截图"
                                         Click="PrintWindowCaptureButton_Click"
-                                        Background="{StaticResource ControlSurfaceBrush}"
+                                        Background="{DynamicResource ControlSurfaceBrush}"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Margin="0,0,8,8"/>
                             </WrapPanel>
@@ -425,7 +425,7 @@
                                        TextWrapping="Wrap"/>
                             <Border x:Name="AttachmentPreviewPanel"
                                     Visibility="Collapsed"
-                                    Background="{StaticResource ControlSurfaceBrush}"
+                                    Background="{DynamicResource ControlSurfaceBrush}"
                                     BorderBrush="#22000000"
                                     BorderThickness="1"
                                     CornerRadius="8"
@@ -486,7 +486,7 @@
                                      VerticalScrollBarVisibility="Auto"
                                      FontSize="13"
                                      Foreground="#EE000000"
-                                     Background="{StaticResource AnswerSurfaceBrush}"
+                                     Background="{DynamicResource AnswerSurfaceBrush}"
                                      BorderBrush="#20000000"
                                      BorderThickness="1"
                                      Padding="10,8">
@@ -504,9 +504,9 @@
                                 Margin="0,12,0,0"
                                 Height="38"
                                 FontSize="14" FontWeight="SemiBold"
-                                Foreground="{StaticResource PrimaryButtonTextBrush}"
-                                BorderBrush="{StaticResource PrimaryButtonBorderBrush}"
-                                Background="{StaticResource PrimaryButtonBrush}"
+                                Foreground="{DynamicResource PrimaryButtonTextBrush}"
+                                BorderBrush="{DynamicResource PrimaryButtonBorderBrush}"
+                                Background="{DynamicResource PrimaryButtonBrush}"
                                 Style="{StaticResource SendButtonStyle}"/>
                     </Grid>
                 </TabItem>
@@ -528,7 +528,7 @@
                                  FontSize="13"
                                  Foreground="#EE000000"
                                  CaretBrush="#AA000000"
-                                 Background="{StaticResource PanelSurfaceBrush}"
+                                 Background="{DynamicResource PanelSurfaceBrush}"
                                  BorderBrush="#20000000"
                                  BorderThickness="1"
                                  Padding="10,8"
