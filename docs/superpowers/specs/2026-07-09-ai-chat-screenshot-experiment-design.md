@@ -6,13 +6,13 @@ Build an experimental GhostPaste branch that adds AI question answering and scre
 
 ## Branching and Release Safety
 
-All work happens on `experiment/ai-chat-screenshot` in the isolated worktree `D:\test\GhostPaste-ai-experiment`. The public repository must not receive the provided API key. Local builds may embed the key through an ignored generated file named `LocalSecrets.g.cs`; GitHub commits and public releases must not include that file or any executable built with that key.
+All work happens on `experiment/ai-chat-screenshot` in the isolated worktree `D:\test\GhostPaste-ai-experiment`. The public repository must not receive API keys. AI connection details are configured at runtime through the app UI and saved only to the user's local application data folder.
 
 ## API Integration
 
 The app sends requests to an OpenAI-compatible Responses endpoint:
 
-- Base URL: `http://49.51.186.85/v1`
+- Base URL: entered by the user in the AI settings UI.
 - Endpoint: `/responses`
 - Default model: `gpt-5.5-fast`
 - Default reasoning effort: `xhigh`
@@ -40,18 +40,18 @@ The experiment provides several capture strategies for user choice:
 
 The implementation does not attempt to bypass DRM or protected-content restrictions. If a screenshot is blank, restricted, or unavailable, the app reports that limitation instead of pretending capture succeeded.
 
-## Local Secret Handling
+## Local Configuration Handling
 
-The source tree includes `LocalSecrets.cs` with an empty public-safe default and `LocalSecrets.example.txt` as a template. `.gitignore` ignores `LocalSecrets.g.cs`. The local worktree can contain `LocalSecrets.g.cs` with the provided key so a local exe works immediately, but that file is never committed.
+The source tree does not contain a default API endpoint or key. The app stores the user's endpoint and key in `%AppData%\GhostPaste\ai-settings.json`, which is outside the repository and outside the single-file executable.
 
 ## Testing
 
 Unit tests cover:
 
-- Endpoint/model/default configuration.
+- Runtime endpoint/key configuration and default model/reasoning values.
 - Request JSON shape for text-only and text-plus-image prompts.
 - Responses response parsing fallbacks.
 - Screenshot result model and data URL conversion.
-- Secret template and ignore behavior.
+- Local settings persistence behavior.
 
 WPF visual behavior is verified through `dotnet build` and focused layout tests where feasible.

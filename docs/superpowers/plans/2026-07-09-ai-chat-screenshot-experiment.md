@@ -11,31 +11,28 @@
 ## Global Constraints
 
 - Experimental branch: `experiment/ai-chat-screenshot`.
-- Base URL: `http://49.51.186.85/v1`.
+- Base URL: entered by the user in the AI settings UI.
 - Endpoint: `/responses`.
 - Default model: `gpt-5.5-fast`.
 - Default reasoning effort: `xhigh`.
-- Local key file: `LocalSecrets.g.cs`, ignored by Git and not committed.
-- Public GitHub releases must not include an executable containing the local key.
+- API key: entered by the user in the AI settings UI and stored only under local application data.
+- Public GitHub releases must not include an executable containing a baked-in key.
 
 ---
 
-### Task 1: Secret Guardrails
+### Task 1: Runtime AI Settings
 
 **Files:**
 - Modify: `.gitignore`
-- Create: `LocalSecrets.cs`
-- Create: `LocalSecrets.example.txt`
-- Local only: `LocalSecrets.g.cs`
+- Create: `AI/AiSettingsStore.cs`
+- Modify: `AI/AiSettings.cs`
 
 **Interfaces:**
-- Produces: `LocalSecrets.ApiKey`, available only in local ignored builds.
+- Produces: `AiSettings.Empty`, `AiSettings.TryCreate(...)`, and `AiSettingsStore.Load()/Save(...)`.
 
-- [ ] Add `LocalSecrets.g.cs` to `.gitignore`.
-- [ ] Add `LocalSecrets.cs` with an empty public-safe default.
-- [ ] Add `LocalSecrets.example.txt` with the partial override pattern.
-- [ ] Create local ignored `LocalSecrets.g.cs` with the provided key.
-- [ ] Verify `git check-ignore -v LocalSecrets.g.cs` reports the ignore rule.
+- [ ] Add tests for missing local config, save/load round trip, and endpoint normalization.
+- [ ] Implement runtime validation for endpoint and key.
+- [ ] Store settings under `%AppData%\GhostPaste\ai-settings.json`.
 
 ### Task 2: Responses API Layer
 
@@ -49,9 +46,9 @@
 - Test: `GhostPaste.Tests/AI/ResponsesResponseParserTests.cs`
 
 **Interfaces:**
-- Produces: `AiSettings.Default`, `ResponsesRequestBuilder.Build(...)`, `ResponsesResponseParser.ExtractText(...)`, `ResponsesAiClient.SendAsync(...)`.
+- Produces: `AiSettings.Empty`, `ResponsesRequestBuilder.Build(...)`, `ResponsesResponseParser.ExtractText(...)`, `ResponsesAiClient.SendAsync(...)`.
 
-- [ ] Write failing tests for defaults, text-only JSON, image JSON, and parser fallbacks.
+- [ ] Write failing tests for runtime configuration, text-only JSON, image JSON, and parser fallbacks.
 - [ ] Implement the settings, request builder, parser, and HTTP client.
 - [ ] Run `dotnet test GhostPaste.Tests\GhostPaste.Tests.csproj`.
 
@@ -81,7 +78,7 @@
 - Consumes: `ResponsesAiClient`, `ScreenshotService`, `ScreenshotResult`.
 
 - [ ] Move existing paste UI into a `TabControl` tab named `粘贴发送`.
-- [ ] Add `AI问答` tab with prompt box, answer box, screenshot strategy buttons, attachment status, and send button.
+- [ ] Add `AI问答` tab with prompt box, AI settings controls, answer box, screenshot strategy buttons, attachment status, and send button.
 - [ ] Wire capture buttons to update attachment state and prompt context.
 - [ ] Wire AI send button to call `ResponsesAiClient.SendAsync` and display answers/errors.
 - [ ] Run `dotnet build GhostPaste.csproj`.
@@ -97,5 +94,5 @@
 - [ ] Run `dotnet test GhostPaste.Tests\GhostPaste.Tests.csproj`.
 - [ ] Run `dotnet build GhostPaste.csproj`.
 - [ ] Run `dotnet publish GhostPaste.csproj -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true -o publish_out`.
-- [ ] Verify `LocalSecrets.g.cs` remains ignored and untracked.
+- [ ] Verify no endpoint or key is hardcoded in tracked source.
 - [ ] Push `experiment/ai-chat-screenshot` branch only, without creating a public release containing the key.

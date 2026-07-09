@@ -10,6 +10,11 @@ public sealed class MainWindowLayoutTests
 
         StringAssert.Contains(xaml, "Header=\"AI问答\"");
         StringAssert.Contains(xaml, "x:Name=\"AiPromptBox\"");
+        StringAssert.Contains(xaml, "x:Name=\"AiSettingsExpander\"");
+        StringAssert.Contains(xaml, "x:Name=\"AiEndpointBox\"");
+        StringAssert.Contains(xaml, "x:Name=\"AiKeyBox\"");
+        StringAssert.Contains(xaml, "x:Name=\"SaveAiSettingsButton\"");
+        StringAssert.Contains(xaml, "Click=\"SaveAiSettingsButton_Click\"");
         StringAssert.Contains(xaml, "x:Name=\"FullScreenCaptureButton\"");
         StringAssert.Contains(xaml, "x:Name=\"TargetWindowCaptureButton\"");
         StringAssert.Contains(xaml, "x:Name=\"PrintWindowCaptureButton\"");

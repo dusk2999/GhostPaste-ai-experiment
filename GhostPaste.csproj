@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Compile Remove="GhostPaste.Tests\**\*.cs" />
+    <Compile Remove="LocalSecrets.g.cs" />
     <EmbeddedResource Remove="GhostPaste.Tests\**\*" />
     <None Remove="GhostPaste.Tests\**\*" />
     <Page Remove="GhostPaste.Tests\**\*.xaml" />

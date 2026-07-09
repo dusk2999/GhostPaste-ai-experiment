@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,6 +21,8 @@ public partial class MainWindow : Window
     private bool _isSourceReady;
     private readonly DispatcherTimer _tracker;
     private readonly ResponsesAiClient _aiClient;
+    private readonly AiSettingsStore _aiSettingsStore;
+    private AiSettings _aiSettings = AiSettings.Empty;
     private readonly MarkdownFlowDocumentRenderer _markdownRenderer = new();
     private readonly ScreenshotService _screenshotService = new();
     private readonly RecordBoard _recordBoard = new();
@@ -28,7 +31,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        _aiClient = new ResponsesAiClient(new HttpClient(), AiSettings.Default);
+        _aiSettingsStore = new AiSettingsStore();
+        _aiSettings = _aiSettingsStore.Load();
+        _aiClient = new ResponsesAiClient(new HttpClient(), () => _aiSettings);
         SourceInitialized += OnSourceInitialized;
 
         // Poll foreground window every 300ms to track the last non-self window
@@ -39,6 +44,7 @@ public partial class MainWindow : Window
         BoardRecordsList.ItemsSource = _recordBoard.Records;
         BoardStatusText.Text = $"已内置 {_recordBoard.Records.Count} 条计算机网络练习题记录";
         ApplyUiTransparency(100);
+        LoadAiSettingsIntoUi();
         UpdateAttachmentPreview();
     }
 
@@ -121,6 +127,42 @@ public partial class MainWindow : Window
     private void SetAiAnswerMarkdown(string markdown)
     {
         AiMarkdownViewer.Document = _markdownRenderer.Render(markdown);
+    }
+
+    private void LoadAiSettingsIntoUi()
+    {
+        AiEndpointBox.Text = _aiSettings.BaseUri?.ToString() ?? "";
+        AiKeyBox.Password = _aiSettings.ApiKey;
+        AiSettingsExpander.IsExpanded = !_aiSettings.IsConfigured;
+        AiSettingsStatusText.Text = _aiSettings.IsConfigured
+            ? "AI 设置已加载。"
+            : "请先配置调用地址和密钥。";
+    }
+
+    private void SaveAiSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!AiSettings.TryCreate(
+                AiEndpointBox.Text,
+                AiKeyBox.Password,
+                out AiSettings settings,
+                out string error))
+        {
+            AiSettingsStatusText.Text = error;
+            return;
+        }
+
+        try
+        {
+            _aiSettingsStore.Save(settings);
+            _aiSettings = settings;
+            AiEndpointBox.Text = settings.BaseUri?.ToString() ?? "";
+            AiSettingsExpander.IsExpanded = false;
+            AiSettingsStatusText.Text = "AI 设置已保存。";
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            AiSettingsStatusText.Text = $"保存失败：{ex.Message}";
+        }
     }
 
     private async void FullScreenCaptureButton_Click(object sender, RoutedEventArgs e)

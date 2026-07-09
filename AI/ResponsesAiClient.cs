@@ -7,12 +7,17 @@ namespace GhostPaste.AI;
 public sealed class ResponsesAiClient
 {
     private readonly HttpClient _httpClient;
-    private readonly AiSettings _settings;
+    private readonly Func<AiSettings> _settingsProvider;
 
-    public ResponsesAiClient(HttpClient httpClient, AiSettings settings)
+    public ResponsesAiClient(HttpClient httpClient, Func<AiSettings> settingsProvider)
     {
         _httpClient = httpClient;
-        _settings = settings;
+        _settingsProvider = settingsProvider;
+    }
+
+    public ResponsesAiClient(HttpClient httpClient, AiSettings settings)
+        : this(httpClient, () => settings)
+    {
     }
 
     public async Task<string> SendAsync(
@@ -20,21 +25,23 @@ public sealed class ResponsesAiClient
         IReadOnlyList<AiMessageAttachment> attachments,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(_settings.ApiKey))
+        AiSettings settings = _settingsProvider();
+        Uri? responsesUri = settings.ResponsesUri;
+        if (!settings.IsConfigured || responsesUri is null)
         {
-            return "缺少本地 AI 密钥：请创建 LocalSecrets.g.cs 后重新编译。";
+            return "请先在 AI 设置中填写调用地址和密钥。";
         }
 
         string requestJson = ResponsesRequestBuilder.BuildJson(
-            _settings.Model,
+            settings.Model,
             prompt,
             attachments,
-            _settings.ReasoningEffort);
-        using var request = new HttpRequestMessage(HttpMethod.Post, _settings.ResponsesUri)
+            settings.ReasoningEffort);
+        using var request = new HttpRequestMessage(HttpMethod.Post, responsesUri)
         {
             Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
         };
-        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _settings.ApiKey);
+        request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", settings.ApiKey);
 
         using var response = await _httpClient.SendAsync(request, cancellationToken);
         string responseJson = await response.Content.ReadAsStringAsync(cancellationToken);

@@ -398,6 +398,86 @@
                                  VerticalContentAlignment="Top"/>
 
                         <StackPanel Grid.Row="1" Margin="0,10,0,10">
+                            <Expander x:Name="AiSettingsExpander"
+                                      Header="AI设置"
+                                      Foreground="#CC000000"
+                                      Margin="0,0,0,8">
+                                <Border Background="{DynamicResource ControlSurfaceBrush}"
+                                        BorderBrush="#22000000"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="10"
+                                        Margin="0,6,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Text="地址"
+                                                   Foreground="#99000000"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,8"/>
+                                        <TextBox Grid.Row="0"
+                                                 Grid.Column="1"
+                                                 x:Name="AiEndpointBox"
+                                                 MinWidth="220"
+                                                 Height="28"
+                                                 Foreground="#EE000000"
+                                                 CaretBrush="#AA000000"
+                                                 Background="{DynamicResource PanelSurfaceBrush}"
+                                                 BorderBrush="#20000000"
+                                                 BorderThickness="1"
+                                                 Padding="8,4"
+                                                 Margin="0,0,8,8"/>
+                                        <Button Grid.Row="0"
+                                                Grid.Column="2"
+                                                Grid.RowSpan="2"
+                                                x:Name="SaveAiSettingsButton"
+                                                Content="保存"
+                                                Click="SaveAiSettingsButton_Click"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,0,8"/>
+
+                                        <TextBlock Grid.Row="1"
+                                                   Grid.Column="0"
+                                                   Text="密钥"
+                                                   Foreground="#99000000"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,8"/>
+                                        <PasswordBox Grid.Row="1"
+                                                     Grid.Column="1"
+                                                     x:Name="AiKeyBox"
+                                                     Height="28"
+                                                     Foreground="#EE000000"
+                                                     Background="{DynamicResource PanelSurfaceBrush}"
+                                                     BorderBrush="#20000000"
+                                                     BorderThickness="1"
+                                                     Padding="8,4"
+                                                     Margin="0,0,8,8"/>
+
+                                        <TextBlock Grid.Row="2"
+                                                   Grid.Column="0"
+                                                   Grid.ColumnSpan="3"
+                                                   x:Name="AiSettingsStatusText"
+                                                   Foreground="#99000000"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"/>
+                                    </Grid>
+                                </Border>
+                            </Expander>
+
                             <WrapPanel>
                                 <Button x:Name="FullScreenCaptureButton"
                                         Content="全屏截图"

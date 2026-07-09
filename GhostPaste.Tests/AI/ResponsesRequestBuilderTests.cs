@@ -7,14 +7,46 @@ namespace GhostPaste.Tests.AI;
 public sealed class ResponsesRequestBuilderTests
 {
     [TestMethod]
-    public void DefaultSettingsUseExperimentEndpointAndModel()
+    public void EmptySettingsKeepModelDefaultsWithoutEndpointOrKey()
     {
-        var settings = AiSettings.Default;
+        var settings = AiSettings.Empty;
 
-        Assert.AreEqual("http://49.51.186.85/v1/", settings.BaseUri.ToString());
-        Assert.AreEqual("http://49.51.186.85/v1/responses", settings.ResponsesUri.ToString());
+        Assert.IsNull(settings.BaseUri);
+        Assert.IsNull(settings.ResponsesUri);
+        Assert.AreEqual("", settings.ApiKey);
         Assert.AreEqual("gpt-5.5-fast", settings.Model);
         Assert.AreEqual("xhigh", settings.ReasoningEffort);
+        Assert.IsFalse(settings.IsConfigured);
+    }
+
+    [TestMethod]
+    public void TryCreateNormalizesConfiguredResponsesEndpoint()
+    {
+        bool ok = AiSettings.TryCreate(
+            "http://example.test/v1",
+            "test-key",
+            out var settings,
+            out string error);
+
+        Assert.IsTrue(ok, error);
+        Assert.AreEqual("http://example.test/v1/", settings.BaseUri?.ToString());
+        Assert.AreEqual("http://example.test/v1/responses", settings.ResponsesUri?.ToString());
+        Assert.AreEqual("test-key", settings.ApiKey);
+        Assert.IsTrue(settings.IsConfigured);
+    }
+
+    [TestMethod]
+    public void TryCreateRejectsMissingEndpoint()
+    {
+        bool ok = AiSettings.TryCreate(
+            "",
+            "test-key",
+            out var settings,
+            out string error);
+
+        Assert.IsFalse(ok);
+        Assert.AreSame(AiSettings.Empty, settings);
+        Assert.AreEqual("请填写 AI 调用地址。", error);
     }
 
     [TestMethod]
