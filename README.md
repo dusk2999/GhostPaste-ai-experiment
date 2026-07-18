@@ -90,3 +90,7 @@ publish_out\GhostPaste.exe
 - 当前独立实验仓库：`dusk2999/GhostPaste-ai-experiment`
 - 本项目不会在源码中内置 AI 调用地址或密钥。
 - 本地构建输出目录已通过 `.gitignore` 忽略。
+
+## 开源协议
+
+本项目采用 [GNU Affero General Public License v3.0 only](LICENSE)（`AGPL-3.0-only`）。
