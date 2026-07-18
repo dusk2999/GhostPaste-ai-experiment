@@ -1,41 +1,90 @@
-# GhostPaste (模拟键盘输入实现粘贴)
+# GhostPaste AI Experiment
 
-GhostPaste 是一个轻量级的 Windows 悬浮窗工具，主要用于将剪贴板或文本框中的文本，通过**模拟真实键盘按键**的方式发送到目标窗口。它可以完美绕过某些目标软件（如游戏、特定终端或受限环境）对“Ctrl+V”直接粘贴的屏蔽。
+GhostPaste AI Experiment is an experimental Windows floating utility built from GhostPaste. It keeps the original simulated keyboard paste workflow, then adds AI chat, screenshot-assisted prompts, Markdown rendering, image cropping, and a record board for text/image notes.
 
-## 🌟 核心特性
+This repository is the standalone experimental project:
 
-- **极致透明的“水玻璃”界面**：采用底层的 `SetWindowCompositionAttribute` API 和 Acrylic 高斯模糊，彻底摆脱 Windows 系统自带的黑灰色覆盖层，提供真正高透、明亮、极其清爽的白天模式（Light Theme）磨砂玻璃效果。
-- **全局置顶悬浮窗**：窗口永久保持在最上层，不会被目标游戏或软件遮挡，方便随时修改发送的文本。
-- **全区域无死角拖拽**：鼠标点击悬浮窗的任何空白处（包括最顶部边缘区域），都可以平滑拖动窗口，操作极其自由。
-- **自动窗口追踪**：自动检测你最近激活的窗口作为目标窗口，点击“发送”后会自动将焦点切回该目标。
-- **可变速度与“拟人化”输入**：内置打字速度滑块（极速到拟人），完全模拟人类打字的速度和节奏。
-- **自动防干扰（IME 控制）**：在发送 Unicode 字符或中文时，会自动临时禁用目标窗口的中文输入法，防止输入法拦截吃字，发送完毕后自动恢复。
-- **单文件便携部署**：支持打包为独立的单文件 EXE，无需安装，即点即用。
+https://github.com/dusk2999/GhostPaste-ai-experiment
 
-## 🚀 界面体验
+## Status
 
-最新版本的界面采用了极限通透的设计理念：
-1. 取消了传统的实色边框，整个窗口化作一层漂浮在桌面上的“毛玻璃”。
-2. 白色不透明度仅为 12%，剩余的透明区域全部交给系统底层执行纯净的 Gaussian/Acrylic Blur（高斯模糊），实时透射出背后任何窗口的画面和颜色。
-3. 文本输入框采用了微弱的泛白处理（15%白色），在保证通透度的同时兼顾文字的可读性。
+This is an experimental branch project. The original GhostPaste paste-simulation workflow is preserved, while the AI and screenshot features are being tested in this separate project.
 
-## 🛠️ 编译与构建
+## Features
 
-项目基于 **.NET 8.0 WPF** 开发，需要 `win-x64` 平台环境。
+- Simulated keyboard paste: sends text by emulating real keystrokes instead of relying on Ctrl+V.
+- Always-on-top floating window: designed to stay visible above the target app.
+- Transparent UI: opacity slider can make the window background nearly invisible while keeping controls usable.
+- Adjustable typing speed: supports fast sending or slower human-like input.
+- Target window tracking: remembers the most recently focused non-GhostPaste window as the send target.
+- AI chat: sends prompts to an OpenAI-compatible Responses API endpoint.
+- Runtime AI settings: configure API base URL and key in the app UI. They are saved locally and are not hardcoded in source.
+- Screenshot prompts: supports full-screen capture, target-window capture, and PrintWindow capture.
+- Image preview and crop: preview the attached screenshot and crop it before sending to AI.
+- Markdown output: AI answers are rendered as Markdown inside the app.
+- Record board: add, view, reuse, and copy text/image records.
+- Built-in study records: includes 13 computer-network exercise records for quick review.
+- Single-file packaging: publishes as one self-contained Windows exe.
 
-如果你想自行编译出一个独立的、免安装的 `.exe` 可执行文件，可以在项目根目录打开终端，运行以下命令：
+## AI Configuration
 
-```bash
-dotnet publish -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true -o publish_out
+Open the `AI问答` tab and expand `AI设置`.
+
+Fill in:
+
+- `地址`: the API base URL, for example `http://example.com/v1`
+- `密钥`: your API key
+
+The app calls the `/responses` endpoint under that base URL. The default model is `gpt-5.5-fast`, and the default reasoning effort is `xhigh`.
+
+Settings are saved outside the repository:
+
+```text
+%AppData%\GhostPaste\ai-settings.json
 ```
 
-编译完成后，可执行文件 `GhostPaste.exe` 将存放在 `publish_out` 文件夹中。
+No API key or default service address is stored in the tracked source code.
 
-## 🕹️ 使用说明
+## Screenshot Strategies
 
-1. 双击运行 `GhostPaste.exe`，悬浮窗将出现在屏幕中央并始终置顶。
-2. 先用鼠标点击一下你要接收文本的“目标窗口”（比如某个游戏内的聊天框或某个终端）。
-3. 切回 GhostPaste，在输入框中粘贴或打字输入你想要发送的内容。
-4. 调整下方的滑块，选择合适的输入速度（靠左侧为极速，靠右侧为模拟真人敲击的慢速）。
-5. 点击 **发送** 按钮，系统会自动切回目标窗口并开始模拟键盘敲字。
-6. 如果中途想要取消发送，可以随时按下键盘的 `Esc` 键中断。
+The AI tab provides multiple screenshot options:
+
+- `全屏截图`: captures the whole desktop after briefly hiding the GhostPaste window.
+- `目标窗口截图`: captures the last tracked target window from the screen.
+- `PrintWindow截图`: asks Windows to render the target window through PrintWindow, which can work better for some covered or inactive windows.
+
+Some protected content may still appear blank or unavailable. In that case, the app reports the capture failure instead of pretending the image was captured.
+
+## Usage
+
+1. Run `GhostPaste.exe`.
+2. For paste simulation, click the target input field in another app, return to GhostPaste, enter text, adjust speed, and click `发送`.
+3. For AI chat, open `AI问答`, configure the API address and key, enter a question, optionally attach a screenshot, and click `发送给 AI`.
+4. Use `裁切` to crop the current screenshot before sending.
+5. Use `记录板` to store useful text and images, copy them later, or fill them back into the AI prompt.
+6. Press `Esc` while sending text or waiting for AI to cancel the current operation.
+
+## Build
+
+The project is a .NET 8 WPF app for Windows.
+
+Run from the project root:
+
+```powershell
+dotnet restore
+dotnet test .\GhostPaste.Tests\GhostPaste.Tests.csproj
+dotnet publish .\GhostPaste.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o .\publish_out
+```
+
+The generated exe will be:
+
+```text
+publish_out\GhostPaste.exe
+```
+
+## Repository Notes
+
+- The original project repository is `dusk2999/GhostPaste`.
+- This standalone experiment repository is `dusk2999/GhostPaste-ai-experiment`.
+- The app does not include a baked-in API key or hardcoded AI service address.
+- Local build outputs are ignored by Git.
